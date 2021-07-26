@@ -1,6 +1,6 @@
 # StreamUpdate
 
-StreamUpdate in an OpenPlanet plugin that changes your Twitch stream title automatically with the map you're playing.
+StreamUpdate in an OpenPlanet plugin for Trackmania 2020 that changes your Twitch stream title automatically with the map you're playing.
 
 ## Installation
 
