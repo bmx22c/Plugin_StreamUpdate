@@ -6,9 +6,8 @@ StreamUpdate in an OpenPlanet plugin for Trackmania 2020 that changes your Twitc
 
 Put the files in your OpenPlanet directory which is located under:
 ```
-C:\Users\<username>\OpenplanetNext\Scripts
+C:\Users\<username>\OpenplanetNext\Scripts\StreamUpdate
 ```
-Create a folder named `StreamUpdate` (or anything that you want, it doesn't matter).
 
 You will also need to create a Twitch application so that you can have a ClientID as well as a OAuth token.
 
