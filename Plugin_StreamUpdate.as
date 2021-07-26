@@ -17,11 +17,6 @@ PrivateInfo::Get privateInfo;
 bool streamInfoOpen = false;
 string streamTitle = "";
 
-// 0 = Pas dans menu
-// 1 = Dans menu
-// 2 = Dans menu mais déjà update
-// int inMenu = 1;
-
 bool inMenu = true;
 bool checkedInMenu = false;
 
@@ -81,11 +76,11 @@ void GetTwitchInfo()
 		yield();
 	}
 	// TODO - Handle bad request/fails
-	print(req.String());
+	// print(req.String());
 
 	auto json = Json::Parse(req.String());
 	if(json["error"].GetType() == Json::Type::String){
-		print('Erreur de connexion à l\'API');
+		print('Error connecting to the API');
 		return;
 	}
 
@@ -119,8 +114,6 @@ void UpdateStreamInfo()
 		}
 
 		print("Title changed: "+title);
-
-		// print(req.String());
 	}
 }
 
@@ -159,11 +152,11 @@ void ViewStreamInfo(){
 		// yield();
 	}
 	// TODO - Handle bad request/fails
-	print(req.String());
+	// print(req.String());
 
 	auto json = Json::Parse(req.String());
 	if(json["error"].GetType() == Json::Type::String){
-		print('Erreur de connexion à l\'API');
+		print('Error connecting to the API');
 		return;
 	}
 
@@ -171,8 +164,8 @@ void ViewStreamInfo(){
 }
 
 void RenderInterface() {
-	// If streamInfoOpen alors on affige la popup
-	// avec le titre du live dans streamTitle
+	// If streamInfoOpen then we show the popup
+	// with the live title from streamTitle
 	if(streamInfoOpen){
 		vec2 mouse = UI::GetMousePos();
 		UI::SetNextWindowPos(int(mouse.x), int(mouse.y), UI::Cond::Appearing);
