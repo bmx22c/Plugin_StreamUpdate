@@ -1,0 +1,185 @@
+#name "Stream Update"
+#author "bmx22c"
+#category "Streaming"
+
+#include "PrivateInfo.as"
+#include "Formatting.as"
+#include "Icons.as"
+
+[Setting name="Enable live update"]
+bool Setting_EnableLiveUpdate = true;
+
+[Setting name="Live title" description="\{map\}"]
+string Setting_LiveTitle;
+
+string mapId = "";
+PrivateInfo::Get privateInfo;
+bool streamInfoOpen = false;
+string streamTitle = "";
+
+// 0 = Pas dans menu
+// 1 = Dans menu
+// 2 = Dans menu mais déjà update
+// int inMenu = 1;
+
+bool inMenu = true;
+bool checkedInMenu = false;
+
+CTrackMania@ g_app;
+
+CGameCtnChallenge@ GetCurrentMap()
+{
+#if MP41 || TMNEXT
+	return g_app.RootMap;
+#else
+	return g_app.Challenge;
+#endif
+}
+
+void Main()
+{
+	@g_app = cast<CTrackMania>(GetApp());
+
+	Setting_LiveTitle = "";
+	
+	GetTwitchInfo();
+
+	while (true) {
+		CheckMap();
+		yield();
+	}
+}
+
+void RenderMenu()
+{
+	if (!UI::BeginMenu("\\$60f" + Icons::Brands::Twitch + "\\$z Stream Update")) {
+		return;
+	}
+
+	if (UI::MenuItem("\\$9cf" + Icons::PencilAlt + "\\$z Update stream informations")) {
+		UpdateStreamInfo();
+	}
+	if (UI::MenuItem("\\$9cf" + Icons::Eye + "\\$z View stream informations")) {
+		ViewStreamInfo();
+		streamInfoOpen = !streamInfoOpen;
+	}
+
+	UI::EndMenu();
+}
+
+void GetTwitchInfo()
+{
+	Net::HttpRequest req;
+	req.Method = Net::HttpMethod::Get;
+	req.Headers["Accept"] = "application/json";
+	req.Headers["Content-Type"] = "application/json";
+	req.Headers["Client-ID"] = privateInfo.clientId;
+	req.Headers["Authorization"] = "Bearer " + privateInfo.bearer;
+	req.Url = "https://api.twitch.tv/helix/channels?broadcaster_id=" + privateInfo.broadcasterId;
+	req.Start();
+	while (!req.Finished()) {
+		yield();
+	}
+	// TODO - Handle bad request/fails
+	print(req.String());
+
+	auto json = Json::Parse(req.String());
+	if(json["error"].GetType() == Json::Type::String){
+		print('Erreur de connexion à l\'API');
+		return;
+	}
+
+	Setting_LiveTitle = json["data"][0]["title"];
+}
+
+void UpdateStreamInfo()
+{
+	if(Setting_EnableLiveUpdate){
+		string title = Setting_LiveTitle;
+
+		auto currentMap = GetCurrentMap();
+		if (currentMap !is null) {
+			title = Regex::Replace(title, "\\{map\\}", currentMap.MapName);
+		} else {
+			title = Regex::Replace(title, "\\{map\\}", "");
+		}
+
+		title = StripFormatCodes(title);
+
+		Net::HttpRequest req;
+		req.Method = Net::HttpMethod::Patch;
+		req.Headers["Content-Type"] = "application/json";
+		req.Headers["Client-ID"] = privateInfo.clientId;
+		req.Headers["Authorization"] = "Bearer " + privateInfo.bearer;
+		req.Url = "https://api.twitch.tv/helix/channels?broadcaster_id=" + privateInfo.broadcasterId;
+		req.Body = '{"title":"'+title+'"}';
+		req.Start();
+		while (!req.Finished()) {
+			// yield();
+		}
+
+		print("Title changed: "+title);
+
+		// print(req.String());
+	}
+}
+
+void CheckMap()
+{
+	auto currentMap = GetCurrentMap();
+	if (currentMap !is null) {
+		if(mapId != currentMap.EdChallengeId || inMenu == true)
+		{
+			mapId = currentMap.EdChallengeId;
+			print("Map changed");
+			UpdateStreamInfo();
+		}
+
+		inMenu = false;
+		checkedInMenu = false;
+	} else {
+		inMenu = true;
+		if(inMenu == true && checkedInMenu == false){
+			checkedInMenu = true;
+			UpdateStreamInfo();
+		}
+	}
+}
+
+void ViewStreamInfo(){
+	Net::HttpRequest req;
+	req.Method = Net::HttpMethod::Get;
+	req.Headers["Accept"] = "application/json";
+	req.Headers["Content-Type"] = "application/json";
+	req.Headers["Client-ID"] = privateInfo.clientId;
+	req.Headers["Authorization"] = "Bearer " + privateInfo.bearer;
+	req.Url = "https://api.twitch.tv/helix/channels?broadcaster_id=" + privateInfo.broadcasterId;
+	req.Start();
+	while (!req.Finished()) {
+		// yield();
+	}
+	// TODO - Handle bad request/fails
+	print(req.String());
+
+	auto json = Json::Parse(req.String());
+	if(json["error"].GetType() == Json::Type::String){
+		print('Erreur de connexion à l\'API');
+		return;
+	}
+
+	streamTitle = json["data"][0]["title"];
+}
+
+void RenderInterface() {
+	// If streamInfoOpen alors on affige la popup
+	// avec le titre du live dans streamTitle
+	if(streamInfoOpen){
+		vec2 mouse = UI::GetMousePos();
+		UI::SetNextWindowPos(int(mouse.x), int(mouse.y), UI::Cond::Appearing);
+		UI::Begin("\\$60f" + Icons::Brands::Twitch + "\\$z Stream Title", streamInfoOpen, UI::WindowFlags(UI::WindowFlags::NoCollapse | UI::WindowFlags::AlwaysAutoResize | UI::WindowFlags::NoSavedSettings));
+		
+		UI::Text(streamTitle);
+		
+		UI::End();
+	}
+}
