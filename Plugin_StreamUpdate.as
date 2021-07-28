@@ -2,7 +2,6 @@
 #author "bmx22c"
 #category "Streaming"
 
-// #include "PrivateInfo.as"
 #include "Formatting.as"
 #include "Icons.as"
 
@@ -22,7 +21,6 @@ bool Setting_EnableLiveUpdate;
 string Setting_LiveTitle;
 
 string mapId = "";
-// PrivateInfo::Get privateInfo;
 bool streamInfoOpen = false;
 string streamTitle = "";
 
