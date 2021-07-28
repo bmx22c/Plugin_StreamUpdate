@@ -2,18 +2,27 @@
 #author "bmx22c"
 #category "Streaming"
 
-#include "PrivateInfo.as"
+// #include "PrivateInfo.as"
 #include "Formatting.as"
 #include "Icons.as"
 
+[Setting name="Client ID" password]
+string Setting_ClientId;
+
+[Setting name="Bearer" password]
+string Setting_Bearer;
+
+[Setting name="Broadcaster ID" password]
+string Setting_BroadcasterId;
+
 [Setting name="Enable live update"]
-bool Setting_EnableLiveUpdate = true;
+bool Setting_EnableLiveUpdate;
 
 [Setting name="Live title" description="\{map\}"]
 string Setting_LiveTitle;
 
 string mapId = "";
-PrivateInfo::Get privateInfo;
+// PrivateInfo::Get privateInfo;
 bool streamInfoOpen = false;
 string streamTitle = "";
 
@@ -68,9 +77,9 @@ void GetTwitchInfo()
 	req.Method = Net::HttpMethod::Get;
 	req.Headers["Accept"] = "application/json";
 	req.Headers["Content-Type"] = "application/json";
-	req.Headers["Client-ID"] = privateInfo.clientId;
-	req.Headers["Authorization"] = "Bearer " + privateInfo.bearer;
-	req.Url = "https://api.twitch.tv/helix/channels?broadcaster_id=" + privateInfo.broadcasterId;
+	req.Headers["Client-ID"] = Setting_ClientId;
+	req.Headers["Authorization"] = "Bearer " + Setting_Bearer;
+	req.Url = "https://api.twitch.tv/helix/channels?broadcaster_id=" + Setting_BroadcasterId;
 	req.Start();
 	while (!req.Finished()) {
 		yield();
@@ -104,9 +113,9 @@ void UpdateStreamInfo()
 		Net::HttpRequest req;
 		req.Method = Net::HttpMethod::Patch;
 		req.Headers["Content-Type"] = "application/json";
-		req.Headers["Client-ID"] = privateInfo.clientId;
-		req.Headers["Authorization"] = "Bearer " + privateInfo.bearer;
-		req.Url = "https://api.twitch.tv/helix/channels?broadcaster_id=" + privateInfo.broadcasterId;
+		req.Headers["Client-ID"] = Setting_ClientId;
+		req.Headers["Authorization"] = "Bearer " + Setting_Bearer;
+		req.Url = "https://api.twitch.tv/helix/channels?broadcaster_id=" + Setting_BroadcasterId;
 		req.Body = '{"title":"'+title+'"}';
 		req.Start();
 		while (!req.Finished()) {
@@ -144,9 +153,9 @@ void ViewStreamInfo(){
 	req.Method = Net::HttpMethod::Get;
 	req.Headers["Accept"] = "application/json";
 	req.Headers["Content-Type"] = "application/json";
-	req.Headers["Client-ID"] = privateInfo.clientId;
-	req.Headers["Authorization"] = "Bearer " + privateInfo.bearer;
-	req.Url = "https://api.twitch.tv/helix/channels?broadcaster_id=" + privateInfo.broadcasterId;
+	req.Headers["Client-ID"] = Setting_ClientId;
+	req.Headers["Authorization"] = "Bearer " + Setting_Bearer;
+	req.Url = "https://api.twitch.tv/helix/channels?broadcaster_id=" + Setting_BroadcasterId;
 	req.Start();
 	while (!req.Finished()) {
 		// yield();
