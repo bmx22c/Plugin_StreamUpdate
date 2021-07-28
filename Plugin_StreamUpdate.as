@@ -5,19 +5,19 @@
 #include "Formatting.as"
 #include "Icons.as"
 
-[Setting name="Client ID" password]
+[Setting category="Parameters" name="Client ID" password]
 string Setting_ClientId;
 
-[Setting name="Bearer" password]
+[Setting category="Parameters" name="Bearer" password]
 string Setting_Bearer;
 
-[Setting name="Broadcaster ID" password]
+[Setting category="Parameters" name="Broadcaster ID" password]
 string Setting_BroadcasterId;
 
-[Setting name="Enable live update"]
+[Setting category="Live settings" name="Enable live update"]
 bool Setting_EnableLiveUpdate;
 
-[Setting name="Live title" description="\{map\}"]
+[Setting category="Live settings" name="Live title" description="\{map\}"]
 string Setting_LiveTitle;
 
 string mapId = "";
