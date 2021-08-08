@@ -58,7 +58,7 @@ void RenderMenu()
 		return;
 	}
 
-	if (UI::MenuItem("\\$9cf" + Icons::PencilAlt + "\\$z Update stream informations")) {
+	if (UI::MenuItem("\\$9cf" + Icons::Pencil + "\\$z Update stream informations")) {
 		UpdateStreamInfo();
 	}
 	if (UI::MenuItem("\\$9cf" + Icons::Eye + "\\$z View stream informations")) {
